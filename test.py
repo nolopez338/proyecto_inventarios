@@ -1,12 +1,14 @@
 
 
 
-def pedido(costo_unidad, cantidad_producto):
-	costo_venta = costo_unidad*1.3
+def pedido(costo_unidad, cantidad_producto, margen):
+	costo_venta = costo_unidad*(1 + margen)
 	return (costo_venta - costo_unidad)  * cantidad_producto
 
+margen = 0.3
+cantidad_producto = int(input("¿Cuántas unidades del producto quieres vender?\n"))
+costo_unidad = float(input("¿Cuál es el costo por unidad del producto?\n"))
 
-cantidad_producto = int(input("Cuanto producto quieres"))
+ganancias = pedido(costo_unidad, cantidad_producto, margen)
 
-
-print(f"Las ganancias son:{pedido(5000, cantidad_producto)}")
+print(f"Las ganancias son:{ganancias:.2f}")
