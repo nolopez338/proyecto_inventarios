@@ -10,15 +10,70 @@ Funciones principales:
 - pedido(costo_unidad, cantidad_producto): calcula las ganancias obtenidas.
 """
 
+producto_total = 0 
+gasto_total = 0
 
-def pedido(costo_unidad, cantidad_producto, margen):
-	costo_venta = costo_unidad*(1 + margen)
-	return (costo_venta - costo_unidad)  * cantidad_producto
+producto_actual = 0
 
-margen = 0.3
-cantidad_producto = int(input("¿Cuántas unidades del producto quieres vender?\n"))
-costo_unidad = float(input("¿Cuál es el costo por unidad del producto?\n"))
+ingresos = 0
 
-ganancias = pedido(costo_unidad, cantidad_producto, margen)
+def agregar_inventario(costo_unidad, cantidad_producto):
+	global producto_total, producto_actual, gasto_total
 
-print(f"Las ganancias son:{ganancias:.2f}")
+	# Actualizar información
+	producto_total += cantidad_producto
+	producto_actual += cantidad_producto
+	gasto_total += costo_unidad * cantidad_producto
+	print(f"Se agregaron {cantidad_producto} unidades a un costo unitario de {costo_unidad:.2f}")
+
+def realizar_pedido(cantidad_producto, margen):
+	global ingresos, producto_actual, gasto_total, producto_total
+
+	if margen > 1: margen = margen / 100
+
+	if cantidad_producto > producto_actual:
+		print("No hay suficiente producto para realizar este pedido")
+	else:
+		costo_venta = (gasto_total/producto_total)*(1 + margen)
+
+		# Actualizar información
+		ingresos += cantidad_producto * costo_venta
+		producto_actual -= cantidad_producto
+
+		print(f"Se realiza un pedido de {cantidad_producto} productos a un precio de {costo_venta} por unidad")
+
+ejecutando = True
+
+while ejecutando == True:
+
+	rta_usuario = int(input("""
+		Que deseas realizar?
+		1. Agregar inventario
+		2. Realizar pedido
+		3. Revisar información general
+		4. Salir
+		"""))
+
+	if rta_usuario == 4:
+		print("Hasta luego")
+		ejecutando = False
+
+	elif rta_usuario == 3:
+		print(f"""
+			Cantidad de producto actual: {producto_actual}
+			Ganancias: {ingresos - gasto_total}
+			""")
+
+	elif rta_usuario == 2:
+		cantidad_producto = int(input("¿Cuántas unidades del producto quieres vender?\n"))
+		margen = float(input("¿Cuál es el margen que quieres obtener?\n"))
+		
+		realizar_pedido(cantidad_producto, margen)
+
+	elif rta_usuario == 1:
+		cantidad_producto = int(input("¿Cuántas unidades del producto quieres comprar?\n"))
+		costo_unidad = float(input("¿Cuál es el costo por unidad del producto?\n"))
+		agregar_inventario(costo_unidad, cantidad_producto)
+	
+	else:
+		print("No se reconoce el comando")
