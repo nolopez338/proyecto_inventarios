@@ -1,4 +1,14 @@
+"""
+Programa: Manejo de inventarios
+Autor: Nicolás López
+Fecha: 2025-10-29
 
+Descripción:
+Este programa maneja el inventario de una empresa
+
+Funciones principales:
+- pedido(costo_unidad, cantidad_producto): calcula las ganancias obtenidas.
+"""
 
 
 def pedido(costo_unidad, cantidad_producto, margen):
