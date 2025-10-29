@@ -42,38 +42,42 @@ def realizar_pedido(cantidad_producto, margen):
 
 		print(f"Se realiza un pedido de {cantidad_producto} productos a un precio de {costo_venta} por unidad")
 
-ejecutando = True
+def main():
+	ejecutando = True
 
-while ejecutando == True:
+	while ejecutando:
 
-	rta_usuario = int(input("""
-		Que deseas realizar?
-		1. Agregar inventario
-		2. Realizar pedido
-		3. Revisar información general
-		4. Salir
-		"""))
+		rta_usuario = int(input("""
+			Que deseas realizar?
+			1. Agregar inventario
+			2. Realizar pedido
+			3. Revisar información general
+			4. Salir
+			"""))
 
-	if rta_usuario == 4:
-		print("Hasta luego")
-		ejecutando = False
+		if rta_usuario == 4:
+			print("Hasta luego")
+			ejecutando = False
 
-	elif rta_usuario == 3:
-		print(f"""
-			Cantidad de producto actual: {producto_actual}
-			Ganancias: {ingresos - gasto_total}
-			""")
+		elif rta_usuario == 3:
+			print(f"""
+				Cantidad de producto actual: {producto_actual}
+				Ganancias: {ingresos - gasto_total}
+				""")
 
-	elif rta_usuario == 2:
-		cantidad_producto = int(input("¿Cuántas unidades del producto quieres vender?\n"))
-		margen = float(input("¿Cuál es el margen que quieres obtener?\n"))
+		elif rta_usuario == 2:
+			cantidad_producto = int(input("¿Cuántas unidades del producto quieres vender?\n"))
+			margen = float(input("¿Cuál es el margen que quieres obtener?\n"))
+			
+			realizar_pedido(cantidad_producto, margen)
+
+		elif rta_usuario == 1:
+			cantidad_producto = int(input("¿Cuántas unidades del producto quieres comprar?\n"))
+			costo_unidad = float(input("¿Cuál es el costo por unidad del producto?\n"))
+			agregar_inventario(costo_unidad, cantidad_producto)
 		
-		realizar_pedido(cantidad_producto, margen)
+		else:
+			print("No se reconoce el comando")
 
-	elif rta_usuario == 1:
-		cantidad_producto = int(input("¿Cuántas unidades del producto quieres comprar?\n"))
-		costo_unidad = float(input("¿Cuál es el costo por unidad del producto?\n"))
-		agregar_inventario(costo_unidad, cantidad_producto)
-	
-	else:
-		print("No se reconoce el comando")
+if __name__ == "__main__":
+    main()
