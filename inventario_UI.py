@@ -1,96 +1,69 @@
-import tkinter as tk
-from tkinter import messagebox
+# test_inventario.py
+import random
+from unittest.mock import Mock
+import inventario
 
-# Variables globales
-producto_total = 0
-producto_actual = 0
-gasto_total = 0
-ingresos = 0
 
-# Funciones lógicas
-def agregar_inventario():
-    global producto_total, producto_actual, gasto_total
-    try:
-        costo_unidad = float(entry_costo.get())
-        cantidad = int(entry_cantidad.get())
+def reset_globals():
+    inventario.producto_total = 0
+    inventario.producto_actual = 0
+    inventario.gasto_total = 0
+    inventario.ingresos = 0
 
-        producto_total += cantidad
-        producto_actual += cantidad
-        gasto_total += costo_unidad * cantidad
 
-        messagebox.showinfo("Inventario actualizado", 
-                            f"Se agregaron {cantidad} unidades a un costo unitario de {costo_unidad:.2f}")
-        actualizar_info()
-    except ValueError:
-        messagebox.showerror("Error", "Por favor ingresa valores numéricos válidos")
+def run_tests():
+    print("\n=== PRUEBAS CONTROLADAS DE EVENTOS ===\n")
 
-def realizar_pedido():
-    global ingresos, producto_actual, gasto_total, producto_total
-    try:
-        cantidad = int(entry_cantidad.get())
-        margen = float(entry_margen.get())
+    reset_globals()
 
-        if margen > 1:
-            margen = margen / 100
+    # Reproducibilidad
+    random.seed(123)
 
-        if cantidad > producto_actual:
-            messagebox.showwarning("Sin stock", "No hay suficiente producto para realizar este pedido")
-        else:
-            costo_venta = (gasto_total / producto_total) * (1 + margen)
-            ingresos += cantidad * costo_venta
-            producto_actual -= cantidad
-            messagebox.showinfo("Pedido realizado", 
-                                f"Se vendieron {cantidad} unidades a {costo_venta:.2f} por unidad")
-            actualizar_info()
-    except ValueError:
-        messagebox.showerror("Error", "Por favor ingresa valores numéricos válidos")
-    except ZeroDivisionError:
-        messagebox.showerror("Error", "No hay inventario inicial para calcular el costo de venta")
+    print("--- PRUEBA EVENTO DE COMPRA CON PARÁMETROS FIJOS ---")
+    # Input simulado: comprar 3 unidades
+    fake_input = Mock(side_effect=["3"])
+    inventario.evento_compra(
+        precio_fijo=10.0,
+        cantidad_fija=8,
+        input_func=fake_input
+    )
 
-def actualizar_info():
-    label_info.config(text=f"""
-Cantidad de producto actual: {producto_actual}
-Ganancias: {ingresos - gasto_total:.2f}
-""")
+    print("\n--- PRUEBA EVENTO DE VENTA CON PARÁMETROS FIJOS ---")
+    # Inputs simulados: ofrecer 2 unidades, precio = 9
+    fake_input = Mock(side_effect=["2", "9"])
+    inventario.evento_venta(
+        cant_fija=5,        # comprador desea hasta 5 unidades
+        precio_max_fijo=12,  # comprador acepta hasta 12
+        input_func=fake_input
+    )
 
-# Interfaz gráfica
-ventana = tk.Tk()
-ventana.title("Manejo de Inventarios")
-ventana.geometry("400x400")
-ventana.resizable(False, False)
+    print("\n--- PRUEBA SECUENCIA COMPLETA CONTROLADA ---")
+    fake_input = Mock(side_effect=[
+        "0",   # compra: no comprar
+        "4",   # venta: ofrecer 4
+        "11"   # venta: precio ofrecido
+    ])
 
-# Título
-tk.Label(ventana, text="Gestión de Inventario", font=("Arial", 16, "bold")).pack(pady=10)
+    inventario.evento_compra(
+        precio_fijo=7,
+        cantidad_fija=5,
+        input_func=fake_input
+    )
 
-# Entradas
-frame_inputs = tk.Frame(ventana)
-frame_inputs.pack(pady=10)
+    inventario.evento_venta(
+        cant_fija=10,
+        precio_max_fijo=15,
+        input_func=fake_input
+    )
 
-tk.Label(frame_inputs, text="Cantidad de producto:").grid(row=0, column=0, sticky="e", padx=5, pady=5)
-entry_cantidad = tk.Entry(frame_inputs)
-entry_cantidad.grid(row=0, column=1)
+    # Resumen final
+    print("\n=== RESULTADOS ===")
+    print(f"Total producto: {inventario.producto_total}")
+    print(f"Producto actual: {inventario.producto_actual}")
+    print(f"Gasto total: {inventario.gasto_total}")
+    print(f"Ingresos totales: {inventario.ingresos}")
+    print(f"Ganancia neta: {inventario.ingresos - inventario.gasto_total}")
 
-tk.Label(frame_inputs, text="Costo por unidad:").grid(row=1, column=0, sticky="e", padx=5, pady=5)
-entry_costo = tk.Entry(frame_inputs)
-entry_costo.grid(row=1, column=1)
 
-tk.Label(frame_inputs, text="Margen (% o decimal):").grid(row=2, column=0, sticky="e", padx=5, pady=5)
-entry_margen = tk.Entry(frame_inputs)
-entry_margen.grid(row=2, column=1)
-
-# Botones de acción
-frame_botones = tk.Frame(ventana)
-frame_botones.pack(pady=10)
-
-tk.Button(frame_botones, text="Agregar Inventario", command=agregar_inventario, width=18, bg="#b3e6b3").grid(row=0, column=0, padx=5, pady=5)
-tk.Button(frame_botones, text="Realizar Pedido", command=realizar_pedido, width=18, bg="#add8e6").grid(row=0, column=1, padx=5, pady=5)
-
-# Información general
-label_info = tk.Label(ventana, text="", font=("Courier", 10), justify="left")
-label_info.pack(pady=15)
-actualizar_info()
-
-# Botón de salida
-tk.Button(ventana, text="Salir", command=ventana.destroy, width=15, bg="#ff9999").pack(pady=5)
-
-ventana.mainloop()
+if __name__ == "__main__":
+    run_tests()
